@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import threading
+
 import pytest
 
 from pydsai.interfaces import LinearList
@@ -125,3 +127,29 @@ def test_should_respect_linearlist_interface() -> None:
     removed = dq.remove(2)
     assert removed is True
     assert dq.size() == 2
+
+
+def test_should_handle_concurrent_enqueue_dequeue() -> None:
+    # Arrange: Deque is backed by DoublyLinkedList which is thread-safe
+    dq = Deque()
+    num_threads = 5
+    items_per_thread = 100
+
+    def enqueue_then_dequeue(thread_id: int) -> None:
+        for i in range(items_per_thread):
+            dq.enqueue((thread_id, i))
+        for _ in range(items_per_thread):
+            dq.dequeue()
+
+    # Act
+    threads = [
+        threading.Thread(target=enqueue_then_dequeue, args=(i,))
+        for i in range(num_threads)
+    ]
+    for t in threads:
+        t.start()
+    for t in threads:
+        t.join()
+
+    # Assert: All enqueued and dequeued, deque should be empty
+    assert dq.size() == 0

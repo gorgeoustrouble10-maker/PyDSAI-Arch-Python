@@ -259,7 +259,7 @@ python examples/memory_usage_audit.py
 
 | 项目 | 现状 |
 |------|------|
-| **单元测试** | **52** 个用例（边界、空状态、并发、BST 退化树等）全部通过 |
+| **单元测试** | **55** 个用例（边界、空状态、并发、BST 退化树等）全部通过 |
 | **代码格式** | Black（line length 88） |
 | **类型检查** | mypy strict mode，全方法类型注解 |
 | **文档** | Javadoc 风格 docstring（中英日） |

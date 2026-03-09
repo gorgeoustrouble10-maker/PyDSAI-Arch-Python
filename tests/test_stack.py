@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import threading
+
 import pytest
 
 from pydsai.interfaces import LinearList
@@ -75,3 +77,28 @@ def test_should_respect_linearlist_interface() -> None:
     assert stack.size() == 2
     assert stack.get(0) == 1
     assert stack.get(1) == 3
+
+
+def test_should_handle_concurrent_push_pop() -> None:
+    # Arrange: Stack is backed by ArrayList which is thread-safe
+    stack = Stack()
+    num_threads = 5
+    items_per_thread = 100
+
+    def push_then_pop(thread_id: int) -> None:
+        for i in range(items_per_thread):
+            stack.push((thread_id, i))
+        for _ in range(items_per_thread):
+            stack.pop()
+
+    # Act
+    threads = [
+        threading.Thread(target=push_then_pop, args=(i,)) for i in range(num_threads)
+    ]
+    for t in threads:
+        t.start()
+    for t in threads:
+        t.join()
+
+    # Assert: All pushed and popped, stack should be empty
+    assert stack.size() == 0

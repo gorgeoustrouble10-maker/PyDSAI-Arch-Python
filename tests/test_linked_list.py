@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import threading
+
 import pytest
 
 from pydsai.linked_list import DoublyLinkedList
@@ -215,3 +217,28 @@ def test_should_maintain_o1_head_tail_insertion_order() -> None:
 
     # Assert
     assert list(dll) == [-1, 0, 1, 3, 4, 5, 6]
+
+
+def test_should_handle_concurrent_add_first_add_last() -> None:
+    # Arrange
+    dll = DoublyLinkedList()
+    num_threads = 5
+    items_per_thread = 100
+
+    def add_from_both_ends(thread_id: int) -> None:
+        for i in range(items_per_thread):
+            dll.add_first((thread_id, "first", i))
+            dll.add_last((thread_id, "last", i))
+
+    # Act
+    threads = [
+        threading.Thread(target=add_from_both_ends, args=(i,))
+        for i in range(num_threads)
+    ]
+    for t in threads:
+        t.start()
+    for t in threads:
+        t.join()
+
+    # Assert
+    assert dll.size() == num_threads * items_per_thread * 2
