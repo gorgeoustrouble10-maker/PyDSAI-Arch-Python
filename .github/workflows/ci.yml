@@ -68,10 +68,8 @@ jobs:
       - name: Normalize line endings (CRLF → LF)
         run: find . -name "*.py" -exec sed -i 's/\r$//' {} \;
 
-      - name: Run Black (format then verify)
-        run: |
-          black .
-          black . --check
+      - name: Run Black check
+        run: black . --check
 
       - name: Run mypy
         run: mypy src/pydsai/ --strict
