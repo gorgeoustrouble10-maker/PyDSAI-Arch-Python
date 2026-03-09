@@ -1,0 +1,17 @@
+PyDSAI Performance Benchmark Report
+PyDSAI 性能ベンチマークレポート
+==================================================
+N_ITEMS=20000, N_SEARCH_ITERATIONS=100
+
+Search (20K items)
+  ArrayList.search O(n): 59.23 ms
+  BST.search O(log n): 70.67 ms
+
+Insert at head (20K ops)
+  ArrayList.insert_at(0) O(n): 10284.56 ms
+  Deque.add_first O(1): 19.05 ms
+
+Full iteration (20K items)
+  ArrayList (lock per get): 28.33 ms
+  LinkedList (snapshot iter): 1.88 ms
+
