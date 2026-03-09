@@ -144,6 +144,55 @@ Worst case occurs when insertions are in ascending or descending order (e.g., 1,
 
 ---
 
+## BST Degeneration & Balancing
+
+BST の劣化と平衡
+
+### Why Monitor Balance Factor? (平衡係数を監視する理由)
+
+The **balance factor** of a node is defined as:
+
+ノードの**平衡係数**は次で定義される：
+
+```
+BF(node) = height(left subtree) - height(right subtree)
+```
+
+When **|BF| > 1**, the tree is **unbalanced**. Operations that should be O(log n) degrade toward O(n) because the worst path lengthens.
+
+**|BF| > 1** のとき、木は**不平衡**である。本来 O(log n) である操作が、最悪経路の伸長により O(n) に近づく。
+
+### Degeneration Scenarios (劣化シナリオ)
+
+1. **Ascending/descending insert**: Inserting 1, 2, 3, 4, 5 in order produces a linked list. Height = n - 1.
+2. **Hibbard deletion bias**: Repeated random deletions tend to skew the tree; height approaches √n.
+3. **No rebalancing**: Plain BST never rotates; once unbalanced, it stays unbalanced.
+
+### Use `get_balance_factor()` (get_balance_factor() の使い方)
+
+PyDSAI's `BinarySearchTree` provides `get_balance_factor()` (root's BF) and `get_height()`. Use them to:
+
+1. **Detect imbalance** before critical operations.
+2. **Log metrics** for production monitoring.
+3. **Decide when to rebuild** or migrate to AVL/Red-Black.
+
+```python
+bf = bst.get_balance_factor()
+if abs(bf) > 1:
+    # Consider rebalancing or switching to AVL
+    pass
+```
+
+### Path to Self-Balancing (自己平衡への道)
+
+| Structure | Balance guarantee | When to use |
+|-----------|-------------------|-------------|
+| Plain BST | None | Prototyping, small datasets |
+| AVL Tree | |BF| ≤ 1 | Read-heavy, strict O(log n) |
+| Red-Black | Height ≤ 2·log₂(n+1) | Insert/delete mix |
+
+---
+
 ## Performance Real-world Test
 
 実世界パフォーマンステスト

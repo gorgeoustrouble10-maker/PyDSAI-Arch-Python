@@ -339,3 +339,82 @@ class BinarySearchTree(Tree):
             while curr.right is not None:
                 curr = curr.right
             return curr.val
+
+    def get_height(self) -> int:
+        """Return tree height (max edges from root to leaf). Empty = -1.
+
+        木の高さを返す（根から葉への最大辺数）。空は -1。
+
+        Returns:
+            Height. -1 if empty. 高さ。空なら -1。
+        """
+        with self._lock:
+            return self._height_unsafe(self._root)
+
+    def _height_unsafe(self, node: Optional[_TreeNode]) -> int:
+        """Compute node height. Caller must hold _lock."""
+        if node is None:
+            return -1
+        return (
+            max(
+                self._height_unsafe(node.left),
+                self._height_unsafe(node.right),
+            )
+            + 1
+        )
+
+    def get_balance_factor(self) -> int:
+        """Return root's balance factor: height(left) - height(right).
+
+        根の平衡係数を返す：height(left) - height(right)。
+        |bf| > 1 means unbalanced (AVL would rotate).
+
+        Returns:
+            Balance factor. 0 if empty. 平衡係数。空なら 0。
+        """
+        with self._lock:
+            if self._root is None:
+                return 0
+            h_left = self._height_unsafe(self._root.left)
+            h_right = self._height_unsafe(self._root.right)
+            return h_left - h_right
+
+    def visualize(self) -> None:
+        """Print tree structure to console in a readable layout.
+
+        コンソールに木構造を読みやすい形式で出力する。
+        """
+        with self._lock:
+            lines: list[str] = []
+            self._visualize_unsafe(self._root, "", True, lines)
+            for line in lines:
+                print(line)
+
+    def _visualize_unsafe(
+        self,
+        node: Optional[_TreeNode],
+        prefix: str,
+        is_tail: bool,
+        lines: list[str],
+    ) -> None:
+        """Build visualization lines. Caller must hold _lock."""
+        if node is None:
+            return
+        conn = "└── " if is_tail else "├── "
+        lines.append(prefix + conn + str(node.val))
+
+        children: list[tuple[Optional[_TreeNode], bool]] = []
+        if node.left is not None or node.right is not None:
+            if node.left is not None:
+                children.append((node.left, node.right is None))
+            if node.right is not None:
+                children.append((node.right, True))
+
+        for i, (child, is_last) in enumerate(children):
+            ext = "    " if is_tail else "│   "
+            self._visualize_unsafe(
+                child,
+                prefix + ext,
+                is_last,
+                lines,
+            )
