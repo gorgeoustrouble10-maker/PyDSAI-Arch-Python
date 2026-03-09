@@ -45,10 +45,15 @@ jobs:
   lint:
     name: Black & Mypy
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: .  # 显式指定为仓库根目录，避免路径歧义
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -61,7 +66,8 @@ jobs:
           pip install -r requirements.txt
 
       - name: Run Black check
-        run: black src tests examples --check
+        run: black . --check
+        # 与本地 black . 保持一致；.gitattributes 强制 LF 避免 Windows CRLF 导致差异
 
       - name: Run mypy
         run: mypy src/pydsai/ --strict

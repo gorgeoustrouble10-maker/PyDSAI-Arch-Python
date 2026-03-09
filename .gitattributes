@@ -1,0 +1,4 @@
+# Force LF line endings for cross-platform consistency
+# CI 中 Black 在 Linux 下检查，避免 Windows CRLF 导致格式差异
+* text=auto eol=lf
+*.py text eol=lf
