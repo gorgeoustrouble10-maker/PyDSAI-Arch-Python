@@ -1,5 +1,18 @@
 # PyDSAI
 
+[![CI](https://github.com/gorgeoustrouble10-maker/PyDSAI-Arch-Python/actions/workflows/ci.yml/badge.svg)](https://github.com/gorgeoustrouble10-maker/PyDSAI-Arch-Python/actions/workflows/ci.yml)
+[![Python Version](https://img.shields.io/badge/python-3.11%20%7C%203.12-blue)](https://www.python.org/)
+[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+[![Type Check](https://img.shields.io/badge/mypy-strict-orange)](https://mypy.readthedocs.io/)
+[![Code Style](https://img.shields.io/badge/code%20style-black-000000)](https://github.com/psf/black)
+
+> **Industrial-grade Data Structures & Algorithms Library in Python.**  
+> Engineered for memory efficiency, thread-safety, and robust iterative logic.
+>
+> **工业级 Python 数据结构与算法库。** 专为内存效率、线程安全及高鲁棒性迭代逻辑而设计。
+
+---
+
 AI 赋能的数据结构与算法实现。  
 **AI を活用したデータ構造・アルゴリズム実装**
 
