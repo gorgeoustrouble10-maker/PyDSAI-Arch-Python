@@ -141,8 +141,10 @@ def _measure_slots_vs_dict(n: int = 10_000) -> tuple[int, int]:
     Returns:
         (bytes_with_slots, bytes_with_dict).
     """
+
     class NodeWithSlots:
         __slots__ = ("value", "prev", "next")
+
         def __init__(self, v: Any, p: Any = None, n: Any = None) -> None:
             self.value = v
             self.prev = p
