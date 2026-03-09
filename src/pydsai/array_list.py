@@ -251,8 +251,9 @@ class ArrayList(LinearList):
             Each element in order. 順番の各要素。
         """
         with self._lock:
-            for i in range(self._size):
-                yield self._data[i]
+            snapshot = [self._data[i] for i in range(self._size)]
+        for v in snapshot:
+            yield v
 
     def __getitem__(self, index: int) -> Any:
         """Get element at index. Supports lst[i].
