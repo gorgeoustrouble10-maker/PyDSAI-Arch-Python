@@ -66,12 +66,10 @@ jobs:
           pip install -r requirements.txt
 
       - name: Normalize line endings (CRLF → LF)
-        run: |
-          find . -name "*.py" -exec sed -i 's/\r$//' {} \;
-          # 消除 Windows CRLF 与 Linux LF 差异，确保 Black 检查一致
+        run: find . -name "*.py" -exec sed -i 's/\r$//' {} \;
 
       - name: Run Black check
-        run: black . --check
+        run: black src tests --check
 
       - name: Run mypy
         run: mypy src/pydsai/ --strict
