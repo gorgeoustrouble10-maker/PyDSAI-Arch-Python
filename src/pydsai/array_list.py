@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import functools
 import threading
-from typing import Any, Callable, TypeVar
+from typing import Any, Callable, Iterator, TypeVar
 
 from pydsai.interfaces import LinearList
 
@@ -230,6 +230,48 @@ class ArrayList(LinearList):
             if index < 0 or index >= self._size:
                 raise IndexError(f"Index {index} out of range (size={self._size})")
             self._delete_at_index(index)
+
+    def __len__(self) -> int:
+        """Return the number of elements. Supports len(lst).
+
+        要素数を返す。len(lst) に対応。
+
+        Returns:
+            Number of elements. 配列内の要素数。
+        """
+        with self._lock:
+            return self._size
+
+    def __iter__(self) -> "Iterator[Any]":
+        """Iterate over elements. Supports for x in lst.
+
+        要素を順に走査。for x in lst に対応。
+
+        Yields:
+            Each element in order. 順番の各要素。
+        """
+        with self._lock:
+            for i in range(self._size):
+                yield self._data[i]
+
+    def __getitem__(self, index: int) -> Any:
+        """Get element at index. Supports lst[i].
+
+        インデックスで要素を取得。lst[i] に対応。
+
+        Args:
+            index: Element index from 0. 0 始まりのインデックス。
+
+        Returns:
+            The element at the index. インデックス位置の要素。
+
+        Raises:
+            IndexError: If index out of range. インデックスが範囲外のとき。
+        """
+        with self._lock:
+            if index < 0 or index >= self._size:
+                raise IndexError(f"Index {index} out of range (size={self._size})")
+            return self._data[index]
 
     @log_operation
     def size(self) -> int:

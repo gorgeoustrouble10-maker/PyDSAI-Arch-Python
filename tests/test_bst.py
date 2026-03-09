@@ -10,6 +10,22 @@ from pydsai.bst import BinarySearchTree
 from pydsai.interfaces import Tree
 
 
+def test_should_support_contains_and_iter() -> None:
+    # Arrange
+    bst = BinarySearchTree()
+    bst.insert(50)
+    bst.insert(30)
+    bst.insert(70)
+
+    # Assert __contains__
+    assert 50 in bst
+    assert 30 in bst
+    assert 99 not in bst
+
+    # Assert __iter__ (in-order)
+    assert list(bst) == [30, 50, 70]
+
+
 def test_should_insert_and_search_normal_values() -> None:
     # Arrange
     bst = BinarySearchTree()
@@ -212,6 +228,20 @@ def test_should_respect_tree_interface() -> None:
     assert tree.get_max() == 3
     tree.delete(2)
     assert tree.search(2) is False
+
+
+def test_should_handle_degenerate_bst_without_recursion_error() -> None:
+    # Arrange: Degenerate BST (chain) with 1500 nodes exceeds default recursion limit
+    bst = BinarySearchTree()
+    for i in range(1500):
+        bst.insert(i)
+
+    # Act & Assert: Must not raise RecursionError
+    height = bst.get_height()
+    bf = bst.get_balance_factor()
+
+    assert height == 1499
+    assert bf == -1499  # All nodes on right: height(left)=-1, height(right)=1498
 
 
 def test_should_handle_concurrent_insert_and_search() -> None:

@@ -68,6 +68,22 @@ def test_should_add_last_multiple_elements() -> None:
     assert list(dll) == [1, 2, 3]
 
 
+def test_should_support_len_and_getitem() -> None:
+    # Arrange
+    dll = DoublyLinkedList()
+    dll.add_last(1)
+    dll.add_last(2)
+    dll.add_last(3)
+
+    # Assert __len__
+    assert len(dll) == 3
+
+    # Assert __getitem__
+    assert dll[0] == 1
+    assert dll[1] == 2
+    assert dll[2] == 3
+
+
 def test_should_add_via_interface_add_to_end() -> None:
     # Arrange: 验证 LinearList 接口 add() 等同于 add_last
     dll = DoublyLinkedList()

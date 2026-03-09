@@ -34,8 +34,7 @@ class Stack(LinearList):
         スタックの先頭に要素を追加する。
 
         Args:
-            item: The element to push.
-
+            item: The element to push. 追加する要素。
         """
         self._storage.add(item)
 
@@ -45,10 +44,10 @@ class Stack(LinearList):
         スタックの先頭要素を削除し、その値を返す。
 
         Returns:
-            The top element.
+            The top element. 先頭の要素。
 
         Raises:
-            IndexError: If the stack is empty.
+            IndexError: If the stack is empty. スタックが空のとき。
         """
         return self._storage.pop_last()
 
@@ -58,10 +57,10 @@ class Stack(LinearList):
         スタックの先頭要素を削除せずに返す。
 
         Returns:
-            The top element.
+            The top element. 先頭の要素。
 
         Raises:
-            IndexError: If the stack is empty.
+            IndexError: If the stack is empty. スタックが空のとき。
         """
         return self._storage.peek_last()
 
@@ -81,10 +80,10 @@ class Stack(LinearList):
         指定要素の最初の出現を削除する。LinearList インターフェース対応。
 
         Args:
-            item: The element to remove.
+            item: The element to remove. 削除する要素。
 
         Returns:
-            True if removed, False if not found.
+            True if removed, False if not found. 削除成功時 True、未検出時 False。
         """
         return self._storage.remove(item)
 
@@ -94,10 +93,13 @@ class Stack(LinearList):
         インデックスで要素を取得。0 はスタックの底を表す。
 
         Args:
-            index: Element index from bottom (0-based).
+            index: Element index from bottom (0-based). 底から 0 始まりのインデックス。
 
         Returns:
-            The element at the given index.
+            The element at the given index. インデックス位置の要素。
+
+        Raises:
+            IndexError: If index out of range. インデックスが範囲外のとき。
         """
         return self._storage.get(index)
 
@@ -107,6 +109,6 @@ class Stack(LinearList):
         スタック内の要素数を返す。
 
         Returns:
-            Number of elements.
+            Number of elements. 要素数。
         """
         return self._storage.size()

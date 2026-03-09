@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import threading
 from collections import deque
-from typing import Any, Optional
+from typing import Any, Iterator, Optional
 
 from pydsai.interfaces import Tree
 
@@ -17,11 +17,15 @@ class _TreeNode:
 
     二分探索木の内部ノード。
 
+    __slots__ = ("val", "left", "right")
+
     Attributes:
         val: Node value.
         left: Left child (smaller values).
         right: Right child (larger values).
     """
+
+    __slots__ = ("val", "left", "right")
 
     def __init__(
         self,
@@ -115,6 +119,10 @@ class BinarySearchTree(Tree):
                         self._size += 1
                         return
                     curr = curr.right
+
+    def __contains__(self, val: Any) -> bool:
+        """Support `val in tree`. Delegates to search."""
+        return self.search(val)
 
     def search(self, val: Any) -> bool:
         """Search for a value. O(log n) average, O(n) worst case.
@@ -216,6 +224,27 @@ class BinarySearchTree(Tree):
             self._size -= 1
             return True
 
+    def _inorder_list_unsafe(self) -> list[Any]:
+        """Iterative in-order. Caller must hold _lock."""
+        result: list[Any] = []
+        stack: list[_TreeNode] = []
+        curr: Optional[_TreeNode] = self._root
+        while curr is not None or stack:
+            while curr is not None:
+                stack.append(curr)
+                curr = curr.left
+            curr = stack.pop()
+            result.append(curr.val)
+            curr = curr.right
+        return result
+
+    def __iter__(self) -> Iterator[Any]:
+        """Iterative in-order. Supports for x in tree."""
+        with self._lock:
+            values = self._inorder_list_unsafe()
+        for v in values:
+            yield v
+
     def inorder_traversal(self) -> list[Any]:
         """Return inorder (LDR) traversal. Result is sorted ascending.
 
@@ -225,17 +254,7 @@ class BinarySearchTree(Tree):
             List of values in inorder order.
         """
         with self._lock:
-            result: list[Any] = []
-
-            def _inorder(node: Optional[_TreeNode]) -> None:
-                if node is None:
-                    return
-                _inorder(node.left)
-                result.append(node.val)
-                _inorder(node.right)
-
-            _inorder(self._root)
-            return result
+            return self._inorder_list_unsafe()
 
     def preorder_traversal(self) -> list[Any]:
         """Return preorder (DLR) traversal.
@@ -352,16 +371,21 @@ class BinarySearchTree(Tree):
             return self._height_unsafe(self._root)
 
     def _height_unsafe(self, node: Optional[_TreeNode]) -> int:
-        """Compute node height. Caller must hold _lock."""
+        """Compute node height iteratively (BFS). Caller must hold _lock."""
         if node is None:
             return -1
-        return (
-            max(
-                self._height_unsafe(node.left),
-                self._height_unsafe(node.right),
-            )
-            + 1
-        )
+        height = -1
+        current_level: list[_TreeNode] = [node]
+        while current_level:
+            height += 1
+            next_level: list[_TreeNode] = []
+            for n in current_level:
+                if n.left is not None:
+                    next_level.append(n.left)
+                if n.right is not None:
+                    next_level.append(n.right)
+            current_level = next_level
+        return height
 
     def get_balance_factor(self) -> int:
         """Return root's balance factor: height(left) - height(right).
@@ -397,24 +421,19 @@ class BinarySearchTree(Tree):
         is_tail: bool,
         lines: list[str],
     ) -> None:
-        """Build visualization lines. Caller must hold _lock."""
+        """Build visualization lines iteratively (explicit stack). Caller must hold _lock.
+
+        Avoids RecursionError on degenerate trees with height > ~1000.
+        """
         if node is None:
             return
-        conn = "└── " if is_tail else "├── "
-        lines.append(prefix + conn + str(node.val))
-
-        children: list[tuple[Optional[_TreeNode], bool]] = []
-        if node.left is not None or node.right is not None:
-            if node.left is not None:
-                children.append((node.left, node.right is None))
-            if node.right is not None:
-                children.append((node.right, True))
-
-        for i, (child, is_last) in enumerate(children):
-            ext = "    " if is_tail else "│   "
-            self._visualize_unsafe(
-                child,
-                prefix + ext,
-                is_last,
-                lines,
-            )
+        stack: list[tuple[_TreeNode, str, bool]] = [(node, prefix, is_tail)]
+        while stack:
+            n, pfx, tail = stack.pop()
+            conn = "└── " if tail else "├── "
+            lines.append(pfx + conn + str(n.val))
+            ext = "    " if tail else "│   "
+            if n.right is not None:
+                stack.append((n.right, pfx + ext, True))
+            if n.left is not None:
+                stack.append((n.left, pfx + ext, n.right is None))

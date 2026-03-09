@@ -3,6 +3,7 @@
 PyDSAI データ構造のメモリ使用量監査。
 Measures physical memory (object graph size in Bytes) for ArrayList,
 LinkedList, and BST at 10,000 and 50,000 elements.
+Verifies __slots__ memory savings for Node classes.
 """
 
 from __future__ import annotations
@@ -132,6 +133,54 @@ def run_audit() -> dict[str, dict[int, int]]:
     return results
 
 
+def _measure_slots_vs_dict(n: int = 10_000) -> tuple[int, int]:
+    """Compare memory: N nodes with __slots__ vs with __dict__.
+
+    __slots__ ありと __dict__ のみの N ノードのメモリを比較。
+
+    Returns:
+        (bytes_with_slots, bytes_with_dict).
+    """
+    class NodeWithSlots:
+        __slots__ = ("value", "prev", "next")
+        def __init__(self, v: Any, p: Any = None, n: Any = None) -> None:
+            self.value = v
+            self.prev = p
+            self.next = n
+
+    class NodeWithDict:
+        def __init__(self, v: Any, p: Any = None, n: Any = None) -> None:
+            self.value = v
+            self.prev = p
+            self.next = n
+
+    gc.collect()
+    with redirect_stdout(io.StringIO()):
+        chain_slots: list[NodeWithSlots] = []
+        prev: Any = None
+        for i in range(n):
+            node = NodeWithSlots(i, prev, None)
+            if prev is not None:
+                prev.next = node
+            chain_slots.append(node)
+            prev = node
+    size_slots = _deep_sizeof(chain_slots)
+
+    gc.collect()
+    with redirect_stdout(io.StringIO()):
+        chain_dict: list[NodeWithDict] = []
+        prev = None
+        for i in range(n):
+            node = NodeWithDict(i, prev, None)
+            if prev is not None:
+                prev.next = node
+            chain_dict.append(node)
+            prev = node
+    size_dict = _deep_sizeof(chain_dict)
+
+    return size_slots, size_dict
+
+
 def main() -> None:
     """Run audit, print table, and append results to docs/BENCHMARK_RESULTS.md.
 
@@ -140,6 +189,16 @@ def main() -> None:
     print("PyDSAI Memory Usage Audit")
     print("=" * 60)
     print(f"Element counts: {SIZES}")
+    print()
+
+    # __slots__ vs __dict__ comparison / __slots__ と __dict__ の比較
+    print("__slots__ vs __dict__ (10,000 linked nodes):")
+    size_slots, size_dict = _measure_slots_vs_dict(10_000)
+    saved = size_dict - size_slots
+    pct = 100 * saved / size_dict if size_dict else 0
+    print(f"  With __slots__:  {size_slots:>10,} B")
+    print(f"  With __dict__:   {size_dict:>10,} B")
+    print(f"  Saved:           {saved:>10,} B ({pct:.1f}%)")
     print()
 
     results = run_audit()

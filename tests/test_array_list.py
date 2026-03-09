@@ -84,6 +84,32 @@ def test_should_expand_capacity_when_full() -> None:
         assert arr.get(i) == i
 
 
+def test_should_support_len_getitem_iter() -> None:
+    # Arrange
+    arr = ArrayList()
+    arr.add(10)
+    arr.add(20)
+    arr.add(30)
+
+    # Assert __len__
+    assert len(arr) == 3
+
+    # Assert __getitem__
+    assert arr[0] == 10
+    assert arr[1] == 20
+    assert arr[2] == 30
+
+    # Assert __iter__
+    assert list(arr) == [10, 20, 30]
+
+
+def test_should_raise_index_error_on_getitem_out_of_bounds() -> None:
+    arr = ArrayList()
+    arr.add(1)
+    with pytest.raises(IndexError, match="Index 1 out of range"):
+        _ = arr[1]
+
+
 def test_should_handle_concurrent_writes() -> None:
     # Arrange
     arr = ArrayList()

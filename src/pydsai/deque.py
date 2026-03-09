@@ -37,7 +37,7 @@ class Deque(LinearList):
         先頭に要素を追加する。
 
         Args:
-            item: The element to add.
+            item: The element to add. 追加する要素。
         """
         self._storage.add_first(item)
 
@@ -47,7 +47,7 @@ class Deque(LinearList):
         末尾に要素を追加する。
 
         Args:
-            item: The element to add.
+            item: The element to add. 追加する要素。
         """
         self._storage.add_last(item)
 
@@ -57,10 +57,10 @@ class Deque(LinearList):
         先頭要素を削除して返す。
 
         Returns:
-            The front element.
+            The front element. 先頭の要素。
 
         Raises:
-            IndexError: If the deque is empty.
+            IndexError: If the deque is empty. デックが空のとき。
         """
         return self._storage.pop_first()
 
@@ -120,7 +120,10 @@ class Deque(LinearList):
         先頭要素を削除して返す。キューモード（FIFO）。
 
         Returns:
-            The front element.
+            The front element. 先頭の要素。
+
+        Raises:
+            IndexError: If the deque is empty. デックが空のとき。
         """
         return self.remove_first()
 
@@ -141,7 +144,10 @@ class Deque(LinearList):
         末尾要素を削除して返す。スタックモード（LIFO）。
 
         Returns:
-            The back element.
+            The back element. 末尾の要素。
+
+        Raises:
+            IndexError: If the deque is empty. デックが空のとき。
         """
         return self.remove_last()
 
@@ -150,6 +156,9 @@ class Deque(LinearList):
         """Add element to the back. LinearList interface.
 
         LinearList インターフェース対応。末尾に追加。
+
+        Args:
+            item: The element to add. 追加する要素。
         """
         self.add_last(item)
 
@@ -157,6 +166,12 @@ class Deque(LinearList):
         """Remove first occurrence of element. LinearList interface.
 
         指定要素の最初の出現を削除。LinearList インターフェース対応。
+
+        Args:
+            item: The element to remove. 削除する要素。
+
+        Returns:
+            True if removed, False if not found. 削除成功時 True、未検出時 False。
         """
         return self._storage.remove(item)
 
@@ -164,6 +179,15 @@ class Deque(LinearList):
         """Get element at index. LinearList interface.
 
         インデックスで要素を取得。LinearList インターフェース対応。
+
+        Args:
+            index: Element index from 0. 0 始まりのインデックス。
+
+        Returns:
+            The element at the index. インデックス位置の要素。
+
+        Raises:
+            IndexError: If index out of range. インデックスが範囲外のとき。
         """
         return self._storage.get(index)
 
@@ -171,5 +195,8 @@ class Deque(LinearList):
         """Return the number of elements. LinearList interface.
 
         要素数を返す。LinearList インターフェース対応。
+
+        Returns:
+            Number of elements. 要素数。
         """
         return self._storage.size()

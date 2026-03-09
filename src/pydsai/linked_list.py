@@ -22,6 +22,8 @@ class Node:
         next: Next node; None for tail. 次のノード。末尾では None。
     """
 
+    __slots__ = ("value", "prev", "next")
+
     def __init__(
         self,
         value: Any,
@@ -126,6 +128,12 @@ class DoublyLinkedList(LinearList):
         """Remove and return the first element. Thread-safe.
 
         先頭要素を削除して返す。スレッドセーフ。
+
+        Returns:
+            The first element. 先頭の要素。
+
+        Raises:
+            IndexError: If list is empty. リストが空のとき。
         """
         with self._lock:
             if self._head is None:
@@ -138,6 +146,12 @@ class DoublyLinkedList(LinearList):
         """Remove and return the last element. Thread-safe.
 
         末尾要素を削除して返す。スレッドセーフ。
+
+        Returns:
+            The last element. 末尾の要素。
+
+        Raises:
+            IndexError: If list is empty. リストが空のとき。
         """
         with self._lock:
             if self._tail is None:
@@ -222,6 +236,33 @@ class DoublyLinkedList(LinearList):
             self._tail = prev_node
 
         self._size -= 1
+
+    def __len__(self) -> int:
+        """Return the number of elements. Supports len(lst).
+
+        要素数を返す。len(lst) に対応。
+
+        Returns:
+            Number of elements. 要素数。
+        """
+        with self._lock:
+            return self._size
+
+    def __getitem__(self, index: int) -> Any:
+        """Get element at index. Supports lst[i].
+
+        インデックスで要素を取得。lst[i] に対応。
+
+        Args:
+            index: Element index from 0. 0 始まりのインデックス。
+
+        Returns:
+            The element at the index. インデックス位置の要素。
+
+        Raises:
+            IndexError: If index out of range. インデックスが範囲外のとき。
+        """
+        return self.get(index)
 
     def _iter_unsafe(self) -> Iterator[Any]:
         """Iterate over values. Caller must hold _lock.
